@@ -1,0 +1,49 @@
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <div class="logo">🗽</div>
+            <h1>NYC Trip Analytics</h1>
+            <p>Create your account</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="field">
+                <label>Username</label>
+                <input type="text" formControlName="username" placeholder="johndoe"
+                    [class.error]="form.get('username')?.invalid && form.get('username')?.touched" />
+                <span class="hint" *ngIf="form.get('username')?.hasError('minlength') && form.get('username')?.touched">
+                    At least 3 characters
+                </span>
+            </div>
+
+            <div class="field">
+                <label>Email</label>
+                <input type="email" formControlName="email" placeholder="you@example.com"
+                    [class.error]="form.get('email')?.invalid && form.get('email')?.touched" />
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <input type="password" formControlName="password" placeholder="••••••••"
+                    [class.error]="form.get('password')?.invalid && form.get('password')?.touched" />
+                <span class="hint" *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched">
+                    At least 6 characters
+                </span>
+            </div>
+
+            <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+            <button type="submit" [disabled]="loading">
+                <span *ngIf="!loading">Create Account</span>
+                <span *ngIf="loading" class="spinner"></span>
+            </button>
+        </form>
+
+        <p class="switch">
+            Already have an account?
+            <a routerLink="/login">Sign In</a>
+        </p>
+
+    </div>
+</div>

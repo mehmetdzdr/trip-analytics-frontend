@@ -1,0 +1,18 @@
+<div class="hour-slider">
+    <button class="arrow" (click)="prev()" [disabled]="selectedHour === 0">◀</button>
+
+    <div class="slider-wrapper">
+        <div class="hour-labels">
+            <span>12 AM</span>
+            <span>6 AM</span>
+            <span>12 PM</span>
+            <span>6 PM</span>
+            <span>11 PM</span>
+        </div>
+        <input type="range" min="0" max="23" [value]="selectedHour" (input)="onSliderChange($event)" />
+    </div>
+
+    <button class="arrow" (click)="next()" [disabled]="selectedHour === 23">▶</button>
+
+    <div class="hour-display">{{ formattedHour }}</div>
+</div>

@@ -1,0 +1,74 @@
+<div class="popup">
+
+    <!-- Header -->
+    <div class="popup-header">
+        <div class="header-info">
+            <span class="borough">{{ zone.borough }}</span>
+            <h2>{{ zone.name }}</h2>
+            <span class="postal">ZIP {{ zone.postalCode }}</span>
+        </div>
+        <button class="close-btn" (click)="close.emit()">✕</button>
+    </div>
+
+    <!-- Current Hour Stats -->
+    <div class="section">
+        <div class="section-title">At {{ formattedHour }}</div>
+        <div class="stats-row">
+            <div class="stat">
+                <span class="stat-value pickup">{{ pickupsAtHour | number }}</span>
+                <span class="stat-label">Avg Pickups</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value dropoff">{{ dropoffsAtHour | number }}</span>
+                <span class="stat-label">Avg Dropoffs</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Overall Stats -->
+    <div class="section">
+        <div class="section-title">January 2015 Overview</div>
+        <div class="info-list">
+            <div class="info-row">
+                <span class="info-label">Total Pickups</span>
+                <span class="info-value">{{ zone.pickupCount | number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Total Dropoffs</span>
+                <span class="info-value">{{ zone.dropoffCount | number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Avg Pickups/Day</span>
+                <span class="info-value">{{ avgPickupsPerDay | number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Avg Fare</span>
+                <span class="info-value">${{ zone.avgFare | number:'1.2-2' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Avg Distance</span>
+                <span class="info-value">{{ zone.avgDistance | number:'1.1-1' }} mi</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Area</span>
+                <span class="info-value">{{ zone.areaKm2 | number:'1.1-1' }} km²</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Density</span>
+                <span class="info-value">{{ zone.densityPerKm2 | number:'1.0-0' }}/km²</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Hourly Chart -->
+    <div class="section">
+        <div class="section-title">Hourly Distribution</div>
+        <app-hourly-chart [pickupsByHour]="zone.pickupsByHour" [dropoffsByHour]="zone.dropoffsByHour"
+            [selectedHour]="selectedHour" [daysInDataset]="zone.daysInDataset" />
+    </div>
+
+</div>

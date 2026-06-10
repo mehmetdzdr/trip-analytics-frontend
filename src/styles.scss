@@ -1,1 +1,34 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #0f1117;
+    --bg-secondary: #1a1d27;
+    --bg-card: #1e2130;
+    --accent: #4f8ef7;
+    --accent-hover: #6ba3ff;
+    --text-primary: #f0f2f5;
+    --text-secondary: #8b92a5;
+    --border: #2a2f45;
+    --success: #34d399;
+    --danger: #f87171;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+router-outlet+* {
+    display: block;
+    height: 100vh;
+}

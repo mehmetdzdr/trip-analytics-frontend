@@ -1,0 +1,118 @@
+<div class="stats-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-brand">🗽 NYC Trip Analytics</div>
+        <div class="nav-actions">
+            <button class="btn-nav" (click)="router.navigate(['/map'])">Map</button>
+            <button class="btn-logout" (click)="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="content">
+
+        <!-- LEFT: TABLE -->
+        <div class="table-section">
+
+            <!-- Filters -->
+            <div class="filters">
+                <input class="search" type="text" placeholder="Search ZIP or name..." (input)="onSearch($event)" />
+                <div class="borough-tabs">
+                    <button *ngFor="let b of boroughs" [class.active]="selectedBorough === b"
+                        (click)="onBoroughChange(b)">
+                        {{ b }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <div class="loading-overlay" *ngIf="loading">
+                    <div class="spinner"></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ZIP</th>
+                            <th>Name</th>
+                            <th>Borough</th>
+                            <th (click)="onSort('pickupCount')" class="sortable">
+                                Pickups {{ sortIcon('pickupCount') }}
+                            </th>
+                            <th (click)="onSort('dropoffCount')" class="sortable">
+                                Dropoffs {{ sortIcon('dropoffCount') }}
+                            </th>
+                            <th (click)="onSort('densityPerKm2')" class="sortable">
+                                Density {{ sortIcon('densityPerKm2') }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let zone of filteredZones" (click)="onRowClick(zone.postalCode)"
+                            [class.selected]="selectedZone?.postalCode === zone.postalCode">
+                            <td class="code">{{ zone.postalCode }}</td>
+                            <td>{{ zone.name }}</td>
+                            <td>
+                                <span class="borough-badge" [attr.data-borough]="zone.borough">
+                                    {{ zone.borough }}
+                                </span>
+                            </td>
+                            <td class="num">{{ zone.pickupCount | number }}</td>
+                            <td class="num">{{ zone.dropoffCount | number }}</td>
+                            <td class="num">{{ zone.densityPerKm2 | number:'1.0-0' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                {{ filteredZones.length }} zones
+            </div>
+        </div>
+
+        <!-- RIGHT: DETAIL -->
+        <div class="detail-section" [class.visible]="selectedZone">
+            <ng-container *ngIf="selectedZone">
+                <div class="detail-header">
+                    <div>
+                        <span class="borough-label">{{ selectedZone.borough }}</span>
+                        <h2>{{ selectedZone.name }}</h2>
+                        <span class="zip-label">ZIP {{ selectedZone.postalCode }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-stats">
+                    <div class="stat-card">
+                        <span class="val pickup">{{ selectedZone.pickupCount | number }}</span>
+                        <span class="lbl">Total Pickups</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="val dropoff">{{ selectedZone.dropoffCount | number }}</span>
+                        <span class="lbl">Total Dropoffs</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="val">${{ selectedZone.avgFare | number:'1.2-2' }}</span>
+                        <span class="lbl">Avg Fare</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="val">{{ selectedZone.avgDistance | number:'1.1-1' }} mi</span>
+                        <span class="lbl">Avg Distance</span>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3>Hourly Distribution</h3>
+                    <app-hourly-chart [pickupsByHour]="selectedZone.pickupsByHour"
+                        [dropoffsByHour]="selectedZone.dropoffsByHour" [selectedHour]="selectedHour"
+                        [daysInDataset]="selectedZone.daysInDataset" />
+                </div>
+            </ng-container>
+
+            <div class="empty-state" *ngIf="!selectedZone">
+                <p>Select a zone to see details</p>
+            </div>
+        </div>
+
+    </div>
+</div>

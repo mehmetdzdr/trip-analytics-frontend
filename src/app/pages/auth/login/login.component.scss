@@ -1,0 +1,137 @@
+.auth-wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+
+    .logo {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+}
+
+.field {
+    margin-bottom: 18px;
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+    }
+
+    input {
+        width: 100%;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: var(--text-primary);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+
+        &:focus {
+            border-color: var(--accent);
+        }
+
+        &.error {
+            border-color: var(--danger);
+        }
+
+        &::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+    }
+}
+
+.error-msg {
+    font-size: 13px;
+    color: var(--danger);
+    margin-bottom: 14px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    margin-top: 4px;
+
+    &:hover:not(:disabled) {
+        background: var(--accent-hover);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.switch {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+
+    a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+            color: var(--accent-hover);
+        }
+    }
+}

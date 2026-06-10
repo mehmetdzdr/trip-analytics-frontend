@@ -1,0 +1,214 @@
+.map-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg-primary);
+    overflow: hidden;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 100;
+
+    .nav-brand {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .nav-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 7px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-pair {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+
+        &.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        &:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+    }
+
+    .btn-nav {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+
+        &:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+    }
+
+    .btn-logout {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--danger);
+
+        &:hover {
+            background: rgba(248, 113, 113, 0.1);
+        }
+    }
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    gap: 16px;
+
+    p {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+}
+
+.map-container {
+    flex: 1;
+    transition: flex 0.3s ease;
+    position: relative;
+
+    &.panel-open {
+        flex: 0 0 calc(100% - 360px);
+    }
+}
+
+.side-panel {
+    width: 0;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+
+    &.open {
+        width: 360px;
+    }
+}
+
+.pair-popup {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    z-index: 500;
+    min-width: 260px;
+    text-align: center;
+
+    .pair-content {
+        h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+
+            strong {
+                color: var(--text-primary);
+            }
+        }
+
+        .no-data {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        button {
+            margin-top: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+
+            &:hover {
+                border-color: var(--danger);
+                color: var(--danger);
+            }
+        }
+    }
+}
+
+.slider-bar {
+    height: 64px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+
+.spinner-large {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
