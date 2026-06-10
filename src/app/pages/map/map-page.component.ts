@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HourSliderComponent } from '../../components/map/hour-slider/hour-slider.component';
 import { NycMapComponent } from '../../components/map/nyc-map/nyc-map.component';
@@ -7,7 +7,6 @@ import { ZonePopupComponent } from '../../components/map/zone-popup/zone-popup.c
 import { AuthService } from '../../core/services/auth.service';
 import { ZoneService } from '../../core/services/zone.service';
 import { ZoneDetailDTO, ZonePairDTO, ZoneSummaryDTO } from '../../models/zone.model';
-
 @Component({
     selector: 'app-map-page',
     standalone: true,
@@ -27,11 +26,13 @@ export class MapPageComponent implements OnInit {
     secondPin: string | null = null;
     pairResult: ZonePairDTO | null = null;
     pairLoading = false;
+    pairError = false;
     pairMode = false;
 
     constructor(
         private zoneService: ZoneService,
         private authService: AuthService,
+        private cdr: ChangeDetectorRef,
         public router: Router
     ) { }
 
@@ -68,9 +69,16 @@ export class MapPageComponent implements OnInit {
 
     togglePairMode(): void {
         this.pairMode = !this.pairMode;
+        this.resetPair();
+    }
+
+    resetPair(): void {
         this.firstPin = null;
         this.secondPin = null;
         this.pairResult = null;
+        this.pairError = false;
+        this.pairLoading = false;
+        this.cdr.detectChanges();
     }
 
     private handlePairPin(postalCode: string): void {
@@ -86,12 +94,20 @@ export class MapPageComponent implements OnInit {
 
         this.zoneService.getPair(this.firstPin, this.secondPin).subscribe({
             next: (pair) => {
+
                 this.pairResult = pair;
                 this.pairLoading = false;
+                this.cdr.detectChanges();
+                setTimeout(() => this.togglePairMode(), 3000);
+
             },
-            error: () => {
-                this.pairResult = null;
+            error: (err) => {
+
+                this.pairError = true;
                 this.pairLoading = false;
+                this.cdr.detectChanges();
+                setTimeout(() => this.togglePairMode(), 3000);
+
             }
         });
     }

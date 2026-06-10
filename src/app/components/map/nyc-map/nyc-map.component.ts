@@ -56,6 +56,11 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
         if (changes['selectedHour'] && this.geoJsonLayer) {
             this.refreshColors();
         }
+
+        // firstPin değişince kesikli çizgi göster
+        if (changes['firstPin'] && this.geoJsonLayer) {
+            this.updatePinStyle();
+        }
     }
 
     private initMap(): void {
@@ -169,10 +174,14 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
         const postalCode = feature?.properties?.postalCode;
 
         layer.on({
-            click: () => {
+            click: (e) => {
+                L.DomEvent.stopPropagation(e);
+                e.originalEvent.stopPropagation();
+                e.originalEvent.preventDefault();
                 this.zoneClick.emit(postalCode);
             },
             mouseover: (e) => {
+                L.DomEvent.stopPropagation(e);
                 const l = e.target as L.Path;
                 l.setStyle({ weight: 2, color: '#4f8ef7', fillOpacity: 0.9 });
             },
@@ -188,4 +197,23 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
             layer.setStyle(this.getStyle(feature));
         });
     }
+
+    private updatePinStyle(): void {
+        if (!this.geoJsonLayer) return;
+        this.geoJsonLayer.eachLayer((layer: any) => {
+            const feature = layer.feature;
+            const postalCode = feature?.properties?.postalCode;
+            if (postalCode === this.firstPin) {
+                layer.setStyle({
+                    dashArray: '6, 4',
+                    weight: 3,
+                    color: '#4f8ef7',
+                    fillOpacity: 0.9
+                });
+            } else {
+                layer.setStyle(this.getStyle(feature));
+            }
+        });
+    }
+
 }

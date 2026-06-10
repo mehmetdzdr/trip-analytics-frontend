@@ -5,57 +5,85 @@
         <div class="nav-brand">🗽 NYC Trip Analytics</div>
         <div class="nav-actions">
             <button class="btn-pair" [class.active]="pairMode" (click)="togglePairMode()">
-                {{ pairMode ? 'Cancel Pair' : 'Compare Zones' }}
+                {{ pairMode ? '✕ Cancel' : 'Compare Zones' }}
             </button>
-            <button class="btn-nav" (click)="router.navigate(['/statistics'])">Statistics</button>
-            <button class="btn-logout" (click)="logout()">Logout</button>
+            <button class="btn-nav" [disabled]="pairMode" (click)="!pairMode && router.navigate(['/statistics'])">
+                Statistics
+            </button>
+            <button class="btn-logout" [disabled]="pairMode" (click)="!pairMode && logout()">
+                Logout
+            </button>
         </div>
     </nav>
 
-    <!-- MAIN -->
-    <div class="main">
+    <!-- PAIR MODE OVERLAY -->
+    <div class="pair-overlay" *ngIf="pairMode">
+        <div class="pair-status">
 
-        <!-- LOADING -->
+            <ng-container *ngIf="!pairLoading && !pairResult && !pairError">
+                <div class="step-indicator">
+                    <div class="step" [class.done]="firstPin" [class.active]="!firstPin">
+                        <span class="step-num">1</span>
+                        <span class="step-label">{{ firstPin ? firstPin : 'Select FROM zone' }}</span>
+                    </div>
+                    <div class="step-arrow">→</div>
+                    <div class="step" [class.active]="firstPin && !secondPin">
+                        <span class="step-num">2</span>
+                        <span class="step-label">{{ secondPin ? secondPin : 'Select TO zone' }}</span>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="pairLoading">
+                <div class="pair-loading">
+                    <span class="spinner"></span>
+                    <span>Calculating... pairResult: {{ pairResult | json }}</span>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="pairResult && !pairLoading">
+                <div class="pair-result">
+                    <span class="pair-route">{{ firstPin }} → {{ secondPin }}</span>
+                    <span class="pair-duration">{{ pairResult.avgDuration | number:'1.0-0' }} min avg</span>
+                    <span class="pair-trips">{{ pairResult.tripCount | number }} trips</span>
+                    <span class="pair-auto">Closing in 3s...</span>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="pairError && !pairLoading">
+                <div class="pair-no-data">
+                    <span>⚠ No data for this pair</span>
+                    <span class="pair-auto">Closing in 3s...</span>
+                </div>
+            </ng-container>
+
+            <button class="cancel-pair" (click)="togglePairMode()">✕ Cancel</button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" [class.pair-active]="pairMode">
+
         <div class="loading-overlay" *ngIf="loading">
             <div class="spinner-large"></div>
             <p>Loading NYC data...</p>
         </div>
 
-        <!-- MAP -->
-        <div class="map-container" [class.panel-open]="selectedZone">
+        <div class="map-container" [class.panel-open]="selectedZone && !pairMode">
             <app-nyc-map [zones]="zones" [selectedHour]="selectedHour" [pairMode]="pairMode" [firstPin]="firstPin"
                 (zoneClick)="onZoneClick($event)" />
         </div>
 
-        <!-- SIDE PANEL -->
-        <div class="side-panel" [class.open]="selectedZone">
-            <app-zone-popup *ngIf="selectedZone" [zone]="selectedZone" [selectedHour]="selectedHour"
+        <div class="side-panel" [class.open]="selectedZone && !pairMode">
+            <app-zone-popup *ngIf="selectedZone && !pairMode" [zone]="selectedZone" [selectedHour]="selectedHour"
                 (close)="onClosePanel()" />
-        </div>
-
-        <!-- PAIR RESULT -->
-        <div class="pair-popup" *ngIf="pairMode && secondPin">
-            <div class="pair-content">
-                <ng-container *ngIf="pairLoading">
-                    <span class="spinner"></span>
-                </ng-container>
-                <ng-container *ngIf="!pairLoading && pairResult">
-                    <h4>{{ firstPin }} → {{ secondPin }}</h4>
-                    <p>Avg Duration: <strong>{{ pairResult.avgDuration | number:'1.0-0' }} min</strong></p>
-                    <p>Trip Count: <strong>{{ pairResult.tripCount | number }}</strong></p>
-                </ng-container>
-                <ng-container *ngIf="!pairLoading && !pairResult">
-                    <p class="no-data">No statistics available for this pair.</p>
-                </ng-container>
-                <button (click)="togglePairMode()">Close</button>
-            </div>
         </div>
 
     </div>
 
     <!-- HOUR SLIDER -->
-    <div class="slider-bar">
-        <app-hour-slider [selectedHour]="selectedHour" (hourChange)="onHourChange($event)" />
+    <div class="slider-bar" [class.disabled]="pairMode">
+        <app-hour-slider [selectedHour]="selectedHour" (hourChange)="!pairMode && onHourChange($event)" />
     </div>
 
 </div>
