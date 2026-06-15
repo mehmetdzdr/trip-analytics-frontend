@@ -28,6 +28,8 @@ export class MapPageComponent implements OnInit {
     pairLoading = false;
     pairError = false;
     pairMode = false;
+    densityMode: 'absolute' | 'relative' = 'absolute';
+    tripMode: 'pickup' | 'dropoff' = 'pickup';
 
     constructor(
         private zoneService: ZoneService,
@@ -70,6 +72,14 @@ export class MapPageComponent implements OnInit {
     togglePairMode(): void {
         this.pairMode = !this.pairMode;
         this.resetPair();
+    }
+
+    toggleDensityMode(): void {
+        this.densityMode = this.densityMode === 'absolute' ? 'relative' : 'absolute';
+    }
+
+    toggleTripMode(): void {
+        this.tripMode = this.tripMode === 'pickup' ? 'dropoff' : 'pickup';
     }
 
     resetPair(): void {

@@ -30,3 +30,11 @@ export interface ZonePairDTO {
     tripCount: number;
     avgDuration: number;
 }
+
+export interface PagedResult<T> {
+    items: T[];
+    totalItemCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}

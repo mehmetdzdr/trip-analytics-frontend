@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../models/auth.model';
 
 @Injectable({
@@ -12,11 +12,15 @@ export class AuthService {
     constructor(private http: HttpClient) { }
 
     login(request: LoginRequest): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request);
+        return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
+            tap(response => this.saveToken(response.token))
+        );
     }
 
     register(request: RegisterRequest): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request);
+        return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(
+            tap(response => this.saveToken(response.token))
+        );
     }
 
     saveToken(token: string): void {
@@ -28,8 +32,7 @@ export class AuthService {
     }
 
     isLoggedIn(): boolean {
-        //return !!this.getToken();
-        return true; // Placeholder for actual authentication logic
+        return !!this.getToken();
     }
 
     logout(): void {

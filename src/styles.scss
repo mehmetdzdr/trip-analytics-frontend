@@ -1,34 +1,151 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme((color: (primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
-    --bg-primary: #0f1117;
-    --bg-secondary: #1a1d27;
-    --bg-card: #1e2130;
-    --accent: #4f8ef7;
-    --accent-hover: #6ba3ff;
-    --text-primary: #f0f2f5;
-    --text-secondary: #8b92a5;
-    --border: #2a2f45;
-    --success: #34d399;
-    --danger: #f87171;
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-card: #1e2130;
+  --accent: #4f8ef7;
+  --accent-hover: #6ba3ff;
+  --text-primary: #f0f2f5;
+  --text-secondary: #8b92a5;
+  --border: #2a2f45;
+  --success: #34d399;
+  --danger: #f87171;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    height: 100vh;
-    overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
 }
 
 router-outlet+* {
-    display: block;
-    height: 100vh;
+  display: block;
+  height: 100vh;
+}
+
+.mat-mdc-input-element {
+  color: var(--text-primary) !important;
+}
+
+.mat-sort-header-arrow {
+  color: var(--accent) !important;
+  opacity: 1 !important;
+}
+
+.mat-sort-header-stem,
+.mat-sort-header-pointer-left,
+.mat-sort-header-pointer-right,
+.mat-sort-header-pointer-middle {
+  background: var(--accent) !important;
+}
+
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+  flex: none !important;
+}
+
+.mat-column-postalCode {
+  width: 80px !important;
+}
+
+.mat-column-name {
+  width: 200px !important;
+}
+
+.mat-column-borough {
+  width: 150px !important;
+}
+
+.mat-column-pickupCount {
+  width: 130px !important;
+}
+
+.mat-column-dropoffCount {
+  width: 130px !important;
+}
+
+.mat-column-densityPerKm2 {
+  width: 120px !important;
+}
+
+/* The spinning circle */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  /* Light grey border */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  /* Makes it a circle */
+  border-left-color: #007bff;
+  /* The blue spinning part */
+  animation: spin 1s linear infinite;
+  /* Applies the rotation */
+  margin: 20px auto;
+  /* Centers it horizontally */
+}
+
+/* The animation logic */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Optional: Center it perfectly on the screen */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Full viewport height */
 }

@@ -78,27 +78,10 @@
     flex-direction: column;
     gap: 12px;
     border-bottom: 1px solid var(--border);
+}
 
-    .search {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 14px;
-        color: var(--text-primary);
-        font-size: 13px;
-        outline: none;
-        width: 100%;
-        transition: border-color 0.2s;
-
-        &:focus {
-            border-color: var(--accent);
-        }
-
-        &::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-    }
+.search-field {
+    width: 100%;
 }
 
 .borough-tabs {
@@ -144,71 +127,125 @@
     }
 }
 
-table {
+// ── Material Table ──────────────────────────────────────────
+.mat-mdc-table {
+    background: var(--bg-primary) !important;
     width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
+}
 
-    thead tr {
-        position: sticky;
-        top: 0;
-        background: var(--bg-secondary);
-        z-index: 10;
+.mat-mdc-header-row {
+    background: var(--bg-secondary) !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.mat-mdc-header-cell {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border) !important;
+    flex: none !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.mat-mdc-row {
+    background: transparent !important;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid rgba(42, 47, 69, 0.5) !important;
+
+    &:hover {
+        background: var(--bg-card) !important;
     }
 
-    th {
-        padding: 10px 16px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-
-        &.sortable {
-            cursor: pointer;
-            user-select: none;
-
-            &:hover {
-                color: var(--accent);
-            }
-        }
-    }
-
-    tbody tr {
-        cursor: pointer;
-        transition: background 0.15s;
-        border-bottom: 1px solid rgba(42, 47, 69, 0.5);
-
-        &:hover {
-            background: var(--bg-card);
-        }
-
-        &.selected {
-            background: rgba(79, 142, 247, 0.08);
-            border-left: 2px solid var(--accent);
-        }
-    }
-
-    td {
-        padding: 10px 16px;
-        color: var(--text-primary);
-
-        &.code {
-            font-weight: 600;
-            color: var(--accent);
-            font-size: 12px;
-        }
-
-        &.num {
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
+    &.selected {
+        background: rgba(79, 142, 247, 0.08) !important;
+        border-left: 2px solid var(--accent);
     }
 }
 
+.mat-mdc-cell {
+    color: var(--text-primary) !important;
+    border-bottom: none !important;
+    white-space: nowrap;
+    font-size: 13px;
+    flex: none !important;
+    overflow: hidden;
+
+    &.code {
+        font-weight: 600;
+        color: var(--accent) !important;
+        font-size: 12px;
+    }
+
+    &.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+// Kolon genişlikleri — flex: none ile birlikte çalışır
+.mat-column-postalCode {
+    width: 80px !important;
+}
+
+.mat-column-name {
+    width: 200px !important;
+}
+
+.mat-column-borough {
+    width: 100px !important;
+}
+
+.mat-column-pickupCount {
+    width: 130px !important;
+}
+
+.mat-column-dropoffCount {
+    width: 130px !important;
+}
+
+.mat-column-densityPerKm2 {
+    width: 120px !important;
+}
+
+// Sort
+.mat-sort-header-arrow {
+    color: var(--accent) !important;
+    opacity: 1 !important;
+}
+
+.mat-sort-header-container:hover .mat-sort-header-arrow {
+    opacity: 1 !important;
+}
+
+.mat-mdc-header-cell[aria-sort="ascending"],
+.mat-mdc-header-cell[aria-sort="descending"] {
+    color: var(--accent) !important;
+}
+
+// Paginator
+.mat-mdc-paginator {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-top: 1px solid var(--border);
+}
+
+.mat-mdc-paginator-range-label,
+.mat-mdc-paginator-page-size-label {
+    color: var(--text-secondary) !important;
+}
+
+.mat-mdc-icon-button {
+    color: var(--text-secondary) !important;
+}
+
+// ── Borough badge ───────────────────────────────────────────
 .borough-badge {
     font-size: 11px;
     padding: 2px 8px;
@@ -241,13 +278,7 @@ table {
     }
 }
 
-.table-footer {
-    padding: 10px 20px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    border-top: 1px solid var(--border);
-}
-
+// ── Detail panel ────────────────────────────────────────────
 .detail-section {
     width: 0;
     overflow: hidden;
@@ -349,16 +380,8 @@ table {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-primary);
-
-    .spinner {
-        width: 28px;
-        height: 28px;
-        border: 2px solid var(--border);
-        border-top-color: var(--accent);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
+    background: rgba(15, 17, 23, 0.8);
+    z-index: 5;
 }
 
 @keyframes spin {

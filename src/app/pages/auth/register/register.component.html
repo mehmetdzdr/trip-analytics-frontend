@@ -1,49 +1,73 @@
 <div class="auth-wrapper">
-    <div class="auth-card">
+    <mat-card class="auth-card">
 
-        <div class="auth-header">
-            <div class="logo">🗽</div>
-            <h1>NYC Trip Analytics</h1>
-            <p>Create your account</p>
-        </div>
-
-        <form [formGroup]="form" (ngSubmit)="submit()">
-            <div class="field">
-                <label>Username</label>
-                <input type="text" formControlName="username" placeholder="johndoe"
-                    [class.error]="form.get('username')?.invalid && form.get('username')?.touched" />
-                <span class="hint" *ngIf="form.get('username')?.hasError('minlength') && form.get('username')?.touched">
-                    At least 3 characters
-                </span>
+        <mat-card-header>
+            <div class="auth-header">
+                <h1>NYC Trip Analytics</h1>
+                <p>Create your account</p>
             </div>
+        </mat-card-header>
 
-            <div class="field">
-                <label>Email</label>
-                <input type="email" formControlName="email" placeholder="you@example.com"
-                    [class.error]="form.get('email')?.invalid && form.get('email')?.touched" />
-            </div>
+        <mat-card-content>
+            <form [formGroup]="form" (ngSubmit)="submit()">
 
-            <div class="field">
-                <label>Password</label>
-                <input type="password" formControlName="password" placeholder="••••••••"
-                    [class.error]="form.get('password')?.invalid && form.get('password')?.touched" />
-                <span class="hint" *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched">
-                    At least 6 characters
-                </span>
-            </div>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" placeholder="johndoe" />
+                    <mat-icon matPrefix>person</mat-icon>
+                    <mat-error *ngIf="form.get('username')?.hasError('required')">
+                        Username is required
+                    </mat-error>
+                    <mat-error *ngIf="form.get('username')?.hasError('minlength')">
+                        At least 3 characters
+                    </mat-error>
+                </mat-form-field>
 
-            <div class="error-msg" *ngIf="error">{{ error }}</div>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="you@example.com" />
+                    <mat-icon matPrefix>email</mat-icon>
+                    <mat-error *ngIf="form.get('email')?.hasError('required')">
+                        Email is required
+                    </mat-error>
+                    <mat-error *ngIf="form.get('email')?.hasError('email')">
+                        Invalid email address
+                    </mat-error>
+                </mat-form-field>
 
-            <button type="submit" [disabled]="loading">
-                <span *ngIf="!loading">Create Account</span>
-                <span *ngIf="loading" class="spinner"></span>
-            </button>
-        </form>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Password</mat-label>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                        placeholder="••••••••" />
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="form.get('password')?.hasError('required')">
+                        Password is required
+                    </mat-error>
+                    <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+                        At least 6 characters
+                    </mat-error>
+                </mat-form-field>
 
-        <p class="switch">
-            Already have an account?
-            <a routerLink="/login">Sign In</a>
-        </p>
+                <div class="error-msg" *ngIf="error">{{ error }}</div>
 
-    </div>
+                <button mat-raised-button color="primary" type="submit" class="full-width submit-btn"
+                    [disabled]="loading">
+                    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                    <span *ngIf="!loading">Create Account</span>
+                </button>
+
+            </form>
+        </mat-card-content>
+
+        <mat-card-footer>
+            <p class="switch">
+                Already have an account?
+                <a routerLink="/login">Sign In</a>
+            </p>
+        </mat-card-footer>
+
+    </mat-card>
 </div>

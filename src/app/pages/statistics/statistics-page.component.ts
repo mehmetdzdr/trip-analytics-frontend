@@ -1,105 +1,135 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { HourlyChartComponent } from '../../components/statistics/hourly-chart/hourly-chart.component';
 import { AuthService } from '../../core/services/auth.service';
 import { ZoneService } from '../../core/services/zone.service';
 import { ZoneDetailDTO, ZoneSummaryDTO } from '../../models/zone.model';
 
-type SortKey = 'pickupCount' | 'dropoffCount' | 'avgFare' | 'avgDistance' | 'densityPerKm2';
-type SortDir = 'asc' | 'desc';
-
 @Component({
     selector: 'app-statistics-page',
     standalone: true,
-    imports: [CommonModule, HourlyChartComponent],
+    imports: [
+        CommonModule,
+        HourlyChartComponent,
+        MatTableModule,
+        MatSortModule,
+        MatPaginatorModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatProgressSpinnerModule,
+        MatChipsModule,
+        MatButtonModule,
+        MatIconModule
+    ],
     templateUrl: './statistics-page.component.html',
     styleUrl: './statistics-page.component.scss'
 })
-export class StatisticsPageComponent implements OnInit {
+export class StatisticsPageComponent implements OnInit, AfterViewInit {
+
+    @ViewChild(MatPaginator) paginator!: MatPaginator;
+    @ViewChild(MatSort) sort!: MatSort;
+
+    displayedColumns = ['postalCode', 'name', 'borough', 'pickupCount', 'dropoffCount', 'densityPerKm2'];
 
     zones: ZoneSummaryDTO[] = [];
-    filteredZones: ZoneSummaryDTO[] = [];
+    totalItemCount = 0;
     selectedZone: ZoneDetailDTO | null = null;
     selectedHour = 18;
-    loading = true;
+    loading = false;
 
-    sortKey: SortKey = 'pickupCount';
-    sortDir: SortDir = 'desc';
+    page = 1;
+    pageSize = 20;
+    sortBy = 'pickupCount';
+    sortOrder = 'desc';
+    selectedBorough = 'All';
+    searchQuery = '';
 
     boroughs = ['All', 'Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
-    selectedBorough = 'All';
 
-    searchQuery = '';
+    //private searchSubject = new Subject<string>();
 
     constructor(
         private zoneService: ZoneService,
         private authService: AuthService,
-        public router: Router
+        public router: Router,
+        private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
-        this.zoneService.getAll().subscribe({
-            next: (data) => {
-                this.zones = data;
-                this.applyFilters();
+        this.loadData();
+    }
+
+    ngAfterViewInit(): void { }
+
+    loadData(): void {
+        const timer = setTimeout(() => this.loading = true, 200);
+
+        this.zoneService.getPaged(
+            this.page,
+            this.pageSize,
+            this.sortBy,
+            this.sortOrder,
+            this.selectedBorough,
+            this.searchQuery
+        ).subscribe({
+            next: (result) => {
+                clearTimeout(timer);
+                this.zones = result.items;
+                this.totalItemCount = result.totalItemCount;
                 this.loading = false;
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                this.loading = false;
+                clearTimeout(timer);
+                this.cdr.detectChanges();
             }
         });
     }
 
-    applyFilters(): void {
-        let result = [...this.zones];
-
-        if (this.selectedBorough !== 'All') {
-            result = result.filter(z => z.borough === this.selectedBorough);
-        }
-
-        if (this.searchQuery.trim()) {
-            const q = this.searchQuery.toLowerCase();
-            result = result.filter(z =>
-                z.postalCode.includes(q) || z.name.toLowerCase().includes(q)
-            );
-        }
-
-        result.sort((a, b) => {
-            const aVal = a[this.sortKey as keyof ZoneSummaryDTO] as number;
-            const bVal = b[this.sortKey as keyof ZoneSummaryDTO] as number;
-            return this.sortDir === 'desc' ? bVal - aVal : aVal - bVal;
-        });
-
-        this.filteredZones = result;
+    onSortChange(sort: Sort): void {
+        this.sortBy = sort.active;
+        this.sortOrder = sort.direction || 'desc';
+        this.page = 1;
+        this.loadData();
     }
 
-    onSort(key: SortKey): void {
-        if (this.sortKey === key) {
-            this.sortDir = this.sortDir === 'desc' ? 'asc' : 'desc';
-        } else {
-            this.sortKey = key;
-            this.sortDir = 'desc';
-        }
-        this.applyFilters();
+    onPageChange(event: PageEvent): void {
+        this.page = event.pageIndex + 1;
+        this.pageSize = event.pageSize;
+        this.loadData();
     }
 
     onBoroughChange(borough: string): void {
+        console.log('borough changed:', borough, 'current:', this.selectedBorough);
         this.selectedBorough = borough;
-        this.applyFilters();
+        this.page = 1;
+        this.loadData();
     }
 
-    onSearch(event: Event): void {
+    onSearchInput(event: Event): void {
         this.searchQuery = (event.target as HTMLInputElement).value;
-        this.applyFilters();
+    }
+
+    onSearchSubmit(): void {
+        this.page = 1;
+        this.loadData();
     }
 
     onRowClick(postalCode: string): void {
         this.zoneService.getByPostalCode(postalCode).subscribe({
             next: (detail) => this.selectedZone = detail
         });
-    }
-
-    sortIcon(key: SortKey): string {
-        if (this.sortKey !== key) return '↕';
-        return this.sortDir === 'desc' ? '↓' : '↑';
     }
 
     logout(): void {

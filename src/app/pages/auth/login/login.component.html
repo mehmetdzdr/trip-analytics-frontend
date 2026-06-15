@@ -1,37 +1,54 @@
 <div class="auth-wrapper">
-    <div class="auth-card">
+    <mat-card class="auth-card">
 
-        <div class="auth-header">
-            <div class="logo">🗽</div>
-            <h1>NYC Trip Analytics</h1>
-            <p>Sign in to explore the data</p>
-        </div>
-
-        <form [formGroup]="form" (ngSubmit)="submit()">
-            <div class="field">
-                <label>Email</label>
-                <input type="email" formControlName="email" placeholder="you@example.com"
-                    [class.error]="form.get('email')?.invalid && form.get('email')?.touched" />
+        <mat-card-header>
+            <div class="auth-header">
+                <h1>NYC Trip Analytics</h1>
             </div>
+        </mat-card-header>
 
-            <div class="field">
-                <label>Password</label>
-                <input type="password" formControlName="password" placeholder="••••••••"
-                    [class.error]="form.get('password')?.invalid && form.get('password')?.touched" />
-            </div>
+        <mat-card-content>
+            <form [formGroup]="form" (ngSubmit)="submit()">
 
-            <div class="error-msg" *ngIf="error">{{ error }}</div>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" placeholder="username" />
+                    <mat-icon matPrefix>person</mat-icon>
+                    <mat-error *ngIf="form.get('username')?.hasError('required')">
+                        Username is required
+                    </mat-error>
+                </mat-form-field>
 
-            <button type="submit" [disabled]="loading">
-                <span *ngIf="!loading">Sign In</span>
-                <span *ngIf="loading" class="spinner"></span>
-            </button>
-        </form>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Password</mat-label>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                        placeholder="••••••••" />
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="form.get('password')?.hasError('required')">
+                        Password is required
+                    </mat-error>
+                </mat-form-field>
 
-        <p class="switch">
-            Don't have an account?
-            <a routerLink="/register">Register</a>
-        </p>
+                <div class="error-msg" *ngIf="error">{{ error }}</div>
 
-    </div>
+                <button mat-raised-button color="primary" type="submit" class="full-width submit-btn"
+                    [disabled]="loading" (click)="loading ? $event.preventDefault() : null">
+                    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                    <span *ngIf="!loading">Sign In</span>
+                </button>
+
+            </form>
+        </mat-card-content>
+
+        <mat-card-footer>
+            <p class="switch">
+                Don't have an account?
+                <a routerLink="/register">Register</a>
+            </p>
+        </mat-card-footer>
+
+    </mat-card>
 </div>

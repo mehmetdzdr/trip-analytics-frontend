@@ -28,6 +28,8 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
     @Input() selectedHour = 18;
     @Input() pairMode = false;
     @Input() firstPin: string | null = null;
+    @Input() densityMode: 'absolute' | 'relative' = 'absolute';
+    @Input() tripMode: 'pickup' | 'dropoff' = 'pickup';
 
     @Output() zoneClick = new EventEmitter<string>();
 
@@ -36,7 +38,12 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
     private zoneMap = new Map<string, ZoneSummaryDTO>();
 
     // Her saat için max değer — renk skalası için
+    private maxShareByHour: number[] = new Array(24).fill(0);
+    private totalByHour: number[] = new Array(24).fill(0);
     private maxByHour: number[] = new Array(24).fill(0);
+    private maxByHourDropff: number[] = new Array(24).fill(0);
+    private totalByHourDropoff: number[] = new Array(24).fill(0);
+    private maxShareByHourDropoff: number[] = new Array(24).fill(0);
 
     constructor(private http: HttpClient) { }
 
@@ -60,6 +67,14 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
         // firstPin değişince kesikli çizgi göster
         if (changes['firstPin'] && this.geoJsonLayer) {
             this.updatePinStyle();
+        }
+
+        if (changes['densityMode'] && this.geoJsonLayer) {
+            this.refreshColors();
+        }
+
+        if (changes['tripMode'] && this.geoJsonLayer) {
+            this.refreshColors();
         }
     }
 
@@ -95,21 +110,20 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
     }
 
     private buildZoneMap(): void {
-        console.log('pickupsByHour sample:', this.zones[0].pickupsByHour);
-        console.log('zone keys:', Object.keys(this.zones[0]));
         this.zoneMap.clear();
         this.zones.forEach(z => this.zoneMap.set(z.postalCode, z));
 
-        // Her saat için max pickup hesapla (renk skalası normalize için)
         for (let h = 0; h < 24; h++) {
-            this.maxByHour[h] = Math.max(
-                ...this.zones.map(z => z.pickupsByHour?.[h] ?? 0)
-            );
-        }
+            this.totalByHour[h] = this.zones.reduce((sum, z) => sum + (z.pickupsByHour?.[h] ?? 0), 0);
+            this.maxByHour[h] = Math.max(...this.zones.map(z => z.pickupsByHour?.[h] ?? 0));
+            const pickupShares = this.zones.map(z => (z.pickupsByHour?.[h] ?? 0) / (this.totalByHour[h] || 1));
+            this.maxShareByHour[h] = Math.max(...pickupShares) || 1;
 
-        console.log('zones count:', this.zones.length);
-        console.log('maxByHour[18]:', this.maxByHour[18]);
-        console.log('sample zone:', this.zones[0]);
+            this.totalByHourDropoff[h] = this.zones.reduce((sum, z) => sum + (z.dropoffsByHour?.[h] ?? 0), 0);
+            this.maxByHourDropff[h] = Math.max(...this.zones.map(z => z.dropoffsByHour?.[h] ?? 0));
+            const dropoffShares = this.zones.map(z => (z.dropoffsByHour?.[h] ?? 0) / (this.totalByHourDropoff[h] || 1));
+            this.maxShareByHourDropoff[h] = Math.max(...dropoffShares) || 1;
+        }
     }
 
     private getStyle(feature: any): L.PathOptions {
@@ -125,9 +139,41 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
             };
         }
 
-        const value = zone.pickupsByHour?.[this.selectedHour] ?? 0;
-        const max = this.maxByHour[this.selectedHour] || 1;
-        const intensity = value / max; // 0.0 → 1.0
+        const hourValue = this.tripMode === 'pickup'
+            ? zone.pickupsByHour?.[this.selectedHour] ?? 0
+            : zone.dropoffsByHour?.[this.selectedHour] ?? 0;
+
+
+        let intensity: number;
+
+
+        if (this.densityMode === 'absolute') {
+            const cityTotal = this.tripMode === 'pickup'
+                ? this.totalByHour[this.selectedHour] || 1
+                : this.totalByHourDropoff[this.selectedHour] || 1;
+            const maxShare = this.tripMode === 'pickup'
+                ? this.maxShareByHour[this.selectedHour] || 1
+                : this.maxShareByHourDropoff[this.selectedHour] || 1;
+            const share = hourValue / cityTotal;
+            intensity = this.clamp(share / maxShare, 0, 1);
+        } else {
+            const hourArray = this.tripMode === 'pickup'
+                ? zone.pickupsByHour ?? [1]
+                : zone.dropoffsByHour ?? [1];
+
+            const zoneMaxHour = Math.max(...hourArray) || 1;
+            const zoneMaxHourDaily = zoneMaxHour / 31;
+
+            if (zoneMaxHourDaily < 1) {
+                return {
+                    fillColor: '#2a2f45',
+                    fillOpacity: 0.4,
+                    color: '#0f1117',
+                    weight: 1
+                };
+            }
+            intensity = this.clamp(hourValue / zoneMaxHour, 0, 1);
+        }
 
         return {
             fillColor: this.getColor(intensity),
@@ -186,7 +232,8 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
                 l.setStyle({ weight: 2, color: '#4f8ef7', fillOpacity: 0.9 });
             },
             mouseout: (e) => {
-                this.geoJsonLayer.resetStyle(e.target);
+                e.target.setStyle(this.getStyle(feature));
+                //this.geoJsonLayer.resetStyle(e.target);
             }
         });
     }
@@ -195,6 +242,7 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
         this.geoJsonLayer.eachLayer((layer: any) => {
             const feature = layer.feature;
             layer.setStyle(this.getStyle(feature));
+
         });
     }
 
@@ -214,6 +262,10 @@ export class NycMapComponent implements AfterViewInit, OnChanges {
                 layer.setStyle(this.getStyle(feature));
             }
         });
+    }
+
+    private clamp(value: number, min: number, max: number): number {
+        return Math.max(min, Math.min(max, value));
     }
 
 }

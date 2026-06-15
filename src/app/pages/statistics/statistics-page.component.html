@@ -16,7 +16,15 @@
 
             <!-- Filters -->
             <div class="filters">
-                <input class="search" type="text" placeholder="Search ZIP or name..." (input)="onSearch($event)" />
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>ZIP or name</mat-label>
+                    <input matInput type="text" (input)="onSearchInput($event)" (keyup.enter)="onSearchSubmit()" />
+                    <mat-icon matPrefix>search</mat-icon>
+                    <button mat-icon-button matSuffix (click)="onSearchSubmit()">
+                        <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                </mat-form-field>
+
                 <div class="borough-tabs">
                     <button *ngFor="let b of boroughs" [class.active]="selectedBorough === b"
                         (click)="onBoroughChange(b)">
@@ -28,47 +36,57 @@
             <!-- Table -->
             <div class="table-wrapper">
                 <div class="loading-overlay" *ngIf="loading">
-                    <div class="spinner"></div>
+                    <mat-spinner diameter="32"></mat-spinner>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ZIP</th>
-                            <th>Name</th>
-                            <th>Borough</th>
-                            <th (click)="onSort('pickupCount')" class="sortable">
-                                Pickups {{ sortIcon('pickupCount') }}
-                            </th>
-                            <th (click)="onSort('dropoffCount')" class="sortable">
-                                Dropoffs {{ sortIcon('dropoffCount') }}
-                            </th>
-                            <th (click)="onSort('densityPerKm2')" class="sortable">
-                                Density {{ sortIcon('densityPerKm2') }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let zone of filteredZones" (click)="onRowClick(zone.postalCode)"
-                            [class.selected]="selectedZone?.postalCode === zone.postalCode">
-                            <td class="code">{{ zone.postalCode }}</td>
-                            <td>{{ zone.name }}</td>
-                            <td>
-                                <span class="borough-badge" [attr.data-borough]="zone.borough">
-                                    {{ zone.borough }}
-                                </span>
-                            </td>
-                            <td class="num">{{ zone.pickupCount | number }}</td>
-                            <td class="num">{{ zone.dropoffCount | number }}</td>
-                            <td class="num">{{ zone.densityPerKm2 | number:'1.0-0' }}</td>
-                        </tr>
-                    </tbody>
+                <table mat-table [dataSource]="zones" matSort (matSortChange)="onSortChange($event)">
+
+                    <ng-container matColumnDef="postalCode">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>ZIP</th>
+                        <td mat-cell *matCellDef="let zone" class="code">{{ zone.postalCode }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>Name</th>
+                        <td mat-cell *matCellDef="let zone">{{ zone.name }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="borough">
+                        <th mat-header-cell *matHeaderCellDef>Borough</th>
+                        <td mat-cell *matCellDef="let zone">
+                            <span class="borough-badge" [attr.data-borough]="zone.borough">
+                                {{ zone.borough }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="pickupCount">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before">Pickups</th>
+                        <td mat-cell *matCellDef="let zone" class="num">{{ zone.pickupCount | number }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="dropoffCount">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before">Dropoffs</th>
+                        <td mat-cell *matCellDef="let zone" class="num">{{ zone.dropoffCount | number }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="densityPerKm2">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before">Density</th>
+                        <td mat-cell *matCellDef="let zone" class="num">{{ zone.densityPerKm2 | number:'1.0-0' }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let zone; columns: displayedColumns" (click)="onRowClick(zone.postalCode)"
+                        [class.selected]="selectedZone?.postalCode === zone.postalCode">
+                    </tr>
+
                 </table>
             </div>
 
-            <div class="table-footer">
-                {{ filteredZones.length }} zones
-            </div>
+            <mat-paginator [length]="totalItemCount" [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 50]"
+                (page)="onPageChange($event)" showFirstLastButtons>
+            </mat-paginator>
+
         </div>
 
         <!-- RIGHT: DETAIL -->

@@ -4,8 +4,14 @@
     <nav class="navbar">
         <div class="nav-brand">🗽 NYC Trip Analytics</div>
         <div class="nav-actions">
+            <button class="btn-trip" (click)="toggleTripMode()" [disabled]="pairMode">
+                {{ tripMode === 'pickup' ? 'Pickup' : 'Dropoff' }}
+            </button>
+            <button class="btn-density" [disabled]="pairMode" (click)="toggleDensityMode()">
+                {{ densityMode === 'absolute' ? 'City Share' : 'Local Share' }}
+            </button>
             <button class="btn-pair" [class.active]="pairMode" (click)="togglePairMode()">
-                {{ pairMode ? '✕ Cancel' : 'Compare Zones' }}
+                {{ pairMode ? '✕ Cancel' : 'Calculate Travel Time' }}
             </button>
             <button class="btn-nav" [disabled]="pairMode" (click)="!pairMode && router.navigate(['/statistics'])">
                 Statistics
@@ -71,7 +77,7 @@
 
         <div class="map-container" [class.panel-open]="selectedZone && !pairMode">
             <app-nyc-map [zones]="zones" [selectedHour]="selectedHour" [pairMode]="pairMode" [firstPin]="firstPin"
-                (zoneClick)="onZoneClick($event)" />
+                [densityMode]="densityMode" [tripMode]="tripMode" (zoneClick)="onZoneClick($event)" />
         </div>
 
         <div class="side-panel" [class.open]="selectedZone && !pairMode">
