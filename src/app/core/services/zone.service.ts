@@ -1,13 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { PagedResult, ZoneDetailDTO, ZonePairDTO, ZoneSummaryDTO } from '../../models/zone.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ZoneService {
-    private readonly apiUrl = 'http://localhost:8080/api/zones';
+    private readonly apiUrl = `${environment.apiUrl}/zones`;
 
     constructor(private http: HttpClient) { }
 
